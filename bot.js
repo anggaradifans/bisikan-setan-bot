@@ -1,7 +1,7 @@
-const { Client, RichEmbed } = require("discord.js");
-const { bisikan } = require("./response");
-const fetch = require("node-fetch");
-const querystring = require("querystring");
+import { Client, RichEmbed } from "discord.js";
+import { bisikan, advice, getResponseList } from "./response";
+import fetch from "node-fetch";
+import { stringify } from "querystring";
 require("dotenv").config();
 
 const trim = (str, max) =>
@@ -9,6 +9,7 @@ const trim = (str, max) =>
 
 const client = new Client();
 let index;
+let embed;
 const prefix = "!";
 
 client.on("ready", () => {
@@ -29,12 +30,24 @@ client.on("message", async message => {
     const command = args.shift().toLowerCase();
 
     switch (command) {
+      case "responseid":
+        embed = new RichEmbed()
+          .setColor("#F08080")
+          .addField("Response", trim(getResponseList(bisikan), 1024));
+        message.channel.send(embed);
+        break;
+      case "responseen":
+        embed = new RichEmbed()
+          .setColor("#F08080")
+          .addField("Response", trim(getResponseList(advice), 1024));
+        message.channel.send(embed);
+        break;
       case "rules":
         embed = new RichEmbed()
           .setColor("#F08080")
           .setTitle("BisikanSetanBot")
           .setThumbnail("https://i.imgur.com/wSTFkRM.png")
-          .addField("Commands", "!beligakya \n !shouldibuythis")
+          .addField("Commands", "!responseID \n !responseEN")
           .addField("Beli", "Jangan ketik beli kalo gak mau disetanin");
         message.channel.send(embed);
         break;
@@ -43,7 +56,7 @@ client.on("message", async message => {
           return message.channel.send("You need to supply a search term!");
         }
 
-        query = querystring.stringify({ term: args.join(" ") });
+        query = stringify({ term: args.join(" ") });
 
         const { list } = await fetch(
           `https://api.urbandictionary.com/v0/define?${query}`
@@ -69,6 +82,9 @@ client.on("message", async message => {
           );
 
         message.channel.send(embed);
+        break;
+      default:
+        console.log(`${command} does not registered as command list`);
         break;
     }
   } catch (err) {

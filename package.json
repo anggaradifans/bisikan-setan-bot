@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel bot.js -d lib",
+    "babel-node": "babel-node --presets=/*a*/",
+    "start": "nodemon --exec babel-node bot.js"
   },
   "keywords": [],
   "author": "",
@@ -14,5 +17,12 @@
     "dotenv": "^8.2.0",
     "node-fetch": "^2.6.0",
     "querystring": "^0.2.0"
+  },
+  "devDependencies": {
+    "@babel/node": "^7.6.1",
+    "@babel/core": "^7.8.0",
+    "@babel/preset-env": "^7.8.2",
+    "@babel/register": "^7.8.0",
+    "babel-preset-env": "^1.7.0"
   }
 }

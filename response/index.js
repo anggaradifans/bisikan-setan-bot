@@ -1,6 +1,6 @@
-module.exports.bisikan = [
+export const bisikan = [
+  "Mumpung ada, belum tentu ketemu lagi kan",
   "Ya beli lah",
-  "(╯°□°）╯︵ ┻━┻",
   "Beli dulu aja, kalo gak suka tinggal jual",
   "Beli dulu, ntar makannya tinggal nasi kecap aja",
   "Beli lah, tinggal gesek",
@@ -13,7 +13,10 @@ module.exports.bisikan = [
   "Lebih baik menyesal beli, daripada menyesal gak beli",
   "Punya duit gak? jangan sok sok beli",
   "Of course lah",
-  "Kalo diskon mah ngapain nanya lagi",
+  "Kalo diskon mah ngapain nanya lagi"
+];
+
+export const advice = [
   "Why not. You like them",
   "Do not buy something straight after seeing it, even if it seems mandatory to buy for some reasons.",
   "Believe it or not, there are occasions when it is OK to spend money — even on things you want, but don’t necessarily need. It’s not about guilt; it’s about making mindful decisions before parting with the money you have worked so hard to earn.",
@@ -21,3 +24,9 @@ module.exports.bisikan = [
   "Buy it already!",
   "Buying stuff you want isn’t necessarily a bad thing"
 ];
+
+export const getResponseList = array => {
+  let string = "";
+  array.forEach(o => (string += o + "\n"));
+  return string;
+};
