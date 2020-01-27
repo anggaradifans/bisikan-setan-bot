@@ -1,11 +1,14 @@
 export const bisikan = [
   "Mumpung ada, belum tentu ketemu lagi kan",
   "Ya beli lah",
+  "Belilah, kan lu sultan",
   "Beli dulu aja, kalo gak suka tinggal jual",
+  "Keep khilaf, and nasi kecap",
   "Beli dulu, ntar makannya tinggal nasi kecap aja",
   "Beli lah, tinggal gesek",
   "Udah gajian kan? tunggu apalagi, langsung beli lah",
   "Udah, khilaf aja",
+  "Beli lah, mumpung belom gratis--, ehem maksudnya mumpung masih diskon",
   "Pokoknya kalo pilihannya beli atau gak beli, ya beli lah",
   "Iya dong, mumpung barangnya belum habis",
   "Gak usah ditanya lagi",
@@ -29,4 +32,15 @@ export const getResponseList = array => {
   let string = "";
   array.forEach(o => (string += o + "\n"));
   return string;
+};
+
+export const greeting = person => {
+  let time = new Date().getHours();
+  if (time < 10) {
+    return `Good morning, ${person}`;
+  } else if (time < 20) {
+    return `Good day, ${person}`;
+  } else {
+    return `Good evening, ${person}`;
+  }
 };

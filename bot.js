@@ -1,6 +1,8 @@
 import { Client, RichEmbed } from "discord.js";
-import { bisikan, advice, getResponseList } from "./response";
+import { bisikan, advice, getResponseList, greeting } from "./response";
 import fetch from "node-fetch";
+// import { logger } from "./utility/logger";
+import debug from "./utility/logger2";
 import { stringify } from "querystring";
 require("dotenv").config();
 
@@ -13,11 +15,15 @@ let embed;
 const prefix = "!";
 
 client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`);
+  debug.success(`Logged in as ${client.user.tag}!`);
 });
 
 client.on("message", async message => {
   try {
+    debug.info(
+      `${message.author.username}#${message.author.discriminator} - ${message.content}`
+    );
+    const author = `<@${message.author.id}>`;
     if (message.author.bot) return;
     if (
       message.content.toLowerCase().includes("beli") ||
@@ -51,6 +57,9 @@ client.on("message", async message => {
           .addField("Beli", "Jangan ketik beli kalo gak mau disetanin");
         message.channel.send(embed);
         break;
+      case "greeting":
+        message.channel.send(greeting(author));
+        break;
       case "urban":
         if (!args.length) {
           return message.channel.send("You need to supply a search term!");
@@ -83,12 +92,12 @@ client.on("message", async message => {
 
         message.channel.send(embed);
         break;
-      default:
-        console.log(`${command} does not registered as command list`);
-        break;
+      // default:
+      //   debug.error(`${command} does not registered as command list`);
+      //   break;
     }
   } catch (err) {
-    console.log(err);
+    debug.error(err);
   }
 });
 client.login(process.env.token);

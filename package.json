@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel bot.js -d lib",
     "babel-node": "babel-node --presets=/*a*/",
-    "start": "nodemon --exec babel-node bot.js"
+    "start": "nodemon --exec babel-node bot.js",
+    "stop": "pm2 stop bot.js"
   },
   "keywords": [],
   "author": "",
@@ -16,7 +17,10 @@
     "discord.js": "^11.5.1",
     "dotenv": "^8.2.0",
     "node-fetch": "^2.6.0",
-    "querystring": "^0.2.0"
+    "querystring": "^0.2.0",
+    "winston": "^3.2.1",
+    "ansi-styles": "^3.2.1",
+    "dateformat": "^3.0.3"
   },
   "devDependencies": {
     "@babel/node": "^7.6.1",
