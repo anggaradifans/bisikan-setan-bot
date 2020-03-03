@@ -16,7 +16,8 @@ export const bisikan = [
   "Lebih baik menyesal beli, daripada menyesal gak beli",
   "Punya duit gak? jangan sok sok beli",
   "Of course lah",
-  "Kalo diskon mah ngapain nanya lagi"
+  "Kalo diskon mah ngapain nanya lagi",
+  "The phrase “nanti aja belinya” is such a weak mindset. You are ok with not buying the items that you want, not satisfying your desire. When you felt regret after you buy something, you’ve lost twice. There’s always money in your wallet, and ways to earn them, never settle."
 ];
 
 export const advice = [
