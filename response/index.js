@@ -3,8 +3,8 @@ export const bisikan = [
   "Ya beli lah",
   "Belilah, kan lu sultan",
   "Beli dulu aja, kalo gak suka tinggal jual",
-  "Keep khilaf, and nasi kecap",
-  "Beli dulu, ntar makannya tinggal nasi kecap aja",
+  "Keep khilaf, and nasi telor kecap",
+  "Beli dulu, ntar makannya tinggal nasi telor kecap aja",
   "Beli lah, tinggal gesek",
   "Udah gajian kan? tunggu apalagi, langsung beli lah",
   "Udah, khilaf aja",
@@ -17,7 +17,8 @@ export const bisikan = [
   "Punya duit gak? jangan sok sok beli",
   "Of course lah",
   "Kalo diskon mah ngapain nanya lagi",
-  "The phrase “nanti aja belinya” is such a weak mindset. You are ok with not buying the items that you want, not satisfying your desire. When you felt regret after you buy something, you’ve lost twice. There’s always money in your wallet, and ways to earn them, never settle."
+  "The phrase “nanti aja belinya” is such a weak mindset. You are ok with not buying the items that you want, not satisfying your desire. When you felt regret after you miss discount sales, you’ve lost twice. There’s always money in your wallet, and ways to earn them, never settle.",
+  "Bosen kan di rumah aja karena COVID-19? Mending beli"
 ];
 
 export const advice = [
