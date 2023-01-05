@@ -30,6 +30,10 @@ export const advice = [
   "Buying stuff you want isn’t necessarily a bad thing"
 ];
 
+export const trigger = [
+  "beli", "racun"
+]
+
 export const getResponseList = array => {
   let string = "";
   array.forEach(o => (string += o + "\n"));

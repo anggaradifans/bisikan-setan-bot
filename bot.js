@@ -1,5 +1,5 @@
 import { Client, RichEmbed } from "discord.js";
-import { bisikan, advice, getResponseList, greeting } from "./response";
+import { bisikan, advice, getResponseList, greeting, trigger } from "./response";
 import fetch from "node-fetch";
 // import { logger } from "./utility/logger";
 import debug from "./utility/logger2";
@@ -20,17 +20,21 @@ client.on("ready", () => {
 
 client.on("message", async message => {
   try {
+    const uid = '<@663735949179486208>'
     debug.info(
-      `${message.author.username}#${message.author.discriminator} - ${message.content}`
+      `${message.author.username}#${message.author.discriminator} - ${message}`
     );
     const author = `<@${message.author.id}>`;
     if (message.author.bot) return;
-    if (
-      message.content.toLowerCase().includes("beli") ||
-      message.content.toLowerCase().startsWith("beli")
-    ) {
-      index = Math.floor(Math.random() * bisikan.length);
-      return message.channel.send(bisikan[index]);
+    if(message.content.includes(uid)){
+      for(let i = 0; i < trigger.length; i++){
+        if (
+          message.content.toLowerCase().includes(trigger[i])
+        ) {
+          index = Math.floor(Math.random() * bisikan.length);
+          return message.channel.send(bisikan[index]);
+        }
+      }
     }
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
