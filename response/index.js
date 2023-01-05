@@ -1,3 +1,5 @@
+import { trim } from "../utility"
+
 export const bisikan = [
   "Mumpung ada, belum tentu ketemu lagi kan",
   "Ya beli lah",
@@ -50,3 +52,39 @@ export const greeting = person => {
     return `Good evening, ${person}`;
   }
 };
+
+export const embed = {
+  responseid: {
+    color: 0xF08080,
+    fields: [
+      {
+        name: "Response",
+        value: trim(getResponseList(bisikan), 1024)
+      }
+    ]
+  },
+  responseen: {
+    color: 0xF08080,
+    fields: [
+      {
+        name: "Response",
+        value: trim(getResponseList(advice), 1024)
+      }
+    ]
+  },
+  rules: {
+    color: 0xF08080,
+    title: "BisikanSetanBot",
+    thumbnail: "https://i.imgur.com/wSTFkRM.png",
+    fields: [
+      {
+        name: "Commands",
+        value: "!responseID \n !responseEN"
+      },
+      {
+        name: "Beli",
+        value: "Jangan ketik beli kalo gak mau disetanin"
+      },
+    ]
+  }
+}

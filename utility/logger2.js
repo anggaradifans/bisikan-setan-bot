@@ -265,4 +265,4 @@ if (!global.__stack) {
   });
 }
 
-module.exports = new easynodelog();
+module.exports.debug = new easynodelog();
