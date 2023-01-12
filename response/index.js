@@ -1,4 +1,4 @@
-import { trim } from "../utility"
+import { trim } from "../utility";
 
 export const bisikan = [
   "Mumpung ada, belum tentu ketemu lagi kan",
@@ -20,7 +20,7 @@ export const bisikan = [
   "Of course lah",
   "Kalo diskon mah ngapain nanya lagi",
   "The phrase “nanti aja belinya” is such a weak mindset. You are ok with not buying the items that you want, not satisfying your desire. When you felt regret after you miss discount sales, you’ve lost twice. There’s always money in your wallet, and ways to earn them, never settle.",
-  "Bosen kan di rumah aja karena COVID-19? Mending beli"
+  "Bosen kan di rumah aja karena COVID-19? Mending beli",
 ];
 
 export const advice = [
@@ -29,20 +29,21 @@ export const advice = [
   "Believe it or not, there are occasions when it is OK to spend money — even on things you want, but don’t necessarily need. It’s not about guilt; it’s about making mindful decisions before parting with the money you have worked so hard to earn.",
   "Do you have an immediate use for this item? If not, you might want to wait until you truly need it and make a plan to save up for it.",
   "Buy it already!",
-  "Buying stuff you want isn’t necessarily a bad thing"
+  "Buying stuff you want isn’t necessarily a bad thing",
 ];
 
-export const trigger = [
-  "beli", "racun"
-]
+export const trigger = ["belilah", "beli lah"];
 
-export const getResponseList = array => {
+export const nantiAjaBelinya =
+  "The phrase “nanti aja belinya” is such a weak mindset. You are ok with not buying the items that you want, not satisfying your desire. When you felt regret after you miss discount sales, you’ve lost twice. There’s always money in your wallet, and ways to earn them, never settle.";
+
+export const getResponseList = (array) => {
   let string = "";
-  array.forEach(o => (string += o + "\n"));
+  array.forEach((o) => (string += o + "\n"));
   return string;
 };
 
-export const greeting = person => {
+export const greeting = (person) => {
   let time = new Date().getHours();
   if (time < 10) {
     return `Good morning, ${person}`;
@@ -55,36 +56,36 @@ export const greeting = person => {
 
 export const embed = {
   responseid: {
-    color: 0xF08080,
+    color: 0xf08080,
     fields: [
       {
         name: "Response",
-        value: trim(getResponseList(bisikan), 1024)
-      }
-    ]
+        value: trim(getResponseList(bisikan), 1024),
+      },
+    ],
   },
   responseen: {
-    color: 0xF08080,
+    color: 0xf08080,
     fields: [
       {
         name: "Response",
-        value: trim(getResponseList(advice), 1024)
-      }
-    ]
+        value: trim(getResponseList(advice), 1024),
+      },
+    ],
   },
   rules: {
-    color: 0xF08080,
+    color: 0xf08080,
     title: "BisikanSetanBot",
     thumbnail: "https://i.imgur.com/wSTFkRM.png",
     fields: [
       {
         name: "Commands",
-        value: "!responseID \n !responseEN"
+        value: "!responseID \n !responseEN",
       },
       {
         name: "Beli",
-        value: "Jangan ketik beli kalo gak mau disetanin"
+        value: "Jangan ketik beli kalo gak mau disetanin",
       },
-    ]
-  }
-}
+    ],
+  },
+};

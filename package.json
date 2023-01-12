@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel index.js -d lib",
     "babel-node": "babel-node --presets=/*a*/",
     "start": "nodemon --exec babel-node index.js",
     "stop": "pm2 stop bot.js"
@@ -15,9 +14,11 @@
   "license": "ISC",
   "dependencies": {
     "ansi-styles": "^3.2.1",
+    "axios": "^1.2.2",
     "dateformat": "^3.0.3",
     "discord.js": "^14.7.1",
     "dotenv": "^8.6.0",
+    "nintendo-switch-eshop": "^7.1.2",
     "node-fetch": "^2.6.7",
     "querystring": "^0.2.1",
     "winston": "^3.8.2"
