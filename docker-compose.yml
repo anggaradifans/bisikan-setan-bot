@@ -7,8 +7,11 @@ services:
     restart: unless-stopped
     environment:
       - NODE_ENV=production
+      - PORT=3000
     env_file:
       - .env
+    ports:
+      - "3000:3000"
     volumes:
       # Optional: Mount logs directory if you want persistent logs
       - ./logs:/app/logs

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import http from "node:http";
 import { Client, Events, Collection, GatewayIntentBits } from "discord.js";
 import { bisikan, greeting, nantiAjaBelinya, trigger } from "./response/index.js";
 import { debug, richEmbed } from "./utility/index.js";
@@ -174,4 +175,26 @@ client.on(Events.InteractionCreate, async (interaction) => {
     });
   }
 });
+
+// Simple HTTP server for Render.com port requirement
+const PORT = process.env.PORT || 3000;
+const server = http.createServer((req, res) => {
+  if (req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ 
+      status: 'healthy', 
+      botStatus: client.readyAt ? 'connected' : 'disconnected',
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString()
+    }));
+  } else {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Bisikan Setan Bot is running! 🤖');
+  }
+});
+
+server.listen(PORT, () => {
+  debug.info(`Health check server running on port ${PORT}`);
+});
+
 client.login(process.env.token);
