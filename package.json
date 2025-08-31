@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "babel-node": "babel-node --presets=/*a*/",
-    "start": "nodemon --exec babel-node index.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "stop": "pm2 stop bot.js"
   },
   "keywords": [],

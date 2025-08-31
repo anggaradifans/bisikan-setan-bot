@@ -1,4 +1,4 @@
-import { trim } from "../utility";
+import { trim } from "../utility/index.js";
 
 export const bisikan = [
   "Mumpung ada, belum tentu ketemu lagi kan",
@@ -20,7 +20,9 @@ export const bisikan = [
   "Of course lah",
   "Kalo diskon mah ngapain nanya lagi",
   "The phrase “nanti aja belinya” is such a weak mindset. You are ok with not buying the items that you want, not satisfying your desire. When you felt regret after you miss discount sales, you’ve lost twice. There’s always money in your wallet, and ways to earn them, never settle.",
-  "Bosen kan di rumah aja karena COVID-19? Mending beli",
+  "Tinggal masukin cart terus check out",
+  "Teman-teman, kalau kalian pengen beli sesuatu itu langsung beli aja ya. Jangan sampai hal ini terjadi ke kalian. Nyesek \n \n -Haswin",
+  "Buat apa sih hemat hemat, kalo mau beli ya beli aja, umur siapa yg tau",
 ];
 
 export const advice = [
@@ -32,7 +34,7 @@ export const advice = [
   "Buying stuff you want isn’t necessarily a bad thing",
 ];
 
-export const trigger = ["belilah", "beli lah"];
+export const trigger = ["beli", "belilah", "beli lah"];
 
 export const nantiAjaBelinya =
   "The phrase “nanti aja belinya” is such a weak mindset. You are ok with not buying the items that you want, not satisfying your desire. When you felt regret after you miss discount sales, you’ve lost twice. There’s always money in your wallet, and ways to earn them, never settle.";

@@ -1,11 +1,17 @@
-const fs = require("node:fs");
-const path = require("node:path");
-
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { Client, Events, Collection, GatewayIntentBits } from "discord.js";
-import { bisikan, greeting, nantiAjaBelinya, trigger } from "./response";
-import { debug, richEmbed } from "./utility";
-require("dotenv").config();
+import { bisikan, greeting, nantiAjaBelinya, trigger } from "./response/index.js";
+import { debug, richEmbed } from "./utility/index.js";
+import dotenv from "dotenv";
 import { getGamesAmerica } from "nintendo-switch-eshop";
+
+dotenv.config();
+
+// Fix for __dirname in ES6 modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const client = new Client({
   intents: [
@@ -20,39 +26,51 @@ const prefix = "!";
 
 client.commands = new Collection();
 
-const commandsPath = path.join(__dirname, "commands");
-const commandFiles = fs
-  .readdirSync(commandsPath)
-  .filter((file) => file.endsWith(".js"));
+// Load commands asynchronously
+async function loadCommands() {
+  const commandsPath = path.join(__dirname, "commands");
+  const commandFiles = fs
+    .readdirSync(commandsPath)
+    .filter((file) => file.endsWith(".js"));
 
-for (const file of commandFiles) {
-  const filePath = path.join(commandsPath, file);
-  const command = require(filePath);
-  // Set a new item in the Collection with the key as the command name and the value as the exported module
-  if ("data" in command && "execute" in command) {
-    client.commands.set(command.data.name, command);
-  } else {
-    debug.warn(
-      `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
-    );
+  for (const file of commandFiles) {
+    const filePath = path.join(commandsPath, file);
+    const fileURL = new URL(`file:///${filePath.replace(/\\/g, '/')}`);
+    const command = await import(fileURL);
+    // Set a new item in the Collection with the key as the command name and the value as the exported module
+    // Handle both default export and named exports
+    const cmd = command.default || command;
+    if ("data" in cmd && "execute" in cmd) {
+      client.commands.set(cmd.data.name, cmd);
+    } else {
+      debug.warn(
+        `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+      );
+    }
   }
 }
 
-client.once(Events.ClientReady, (c) => {
-  debug.success(`Logged in as ${c.user.tag}!`);
+// Load commands before starting the bot
+loadCommands().then(() => {
+  debug.info("Commands loaded successfully");
+}).catch((error) => {
+  debug.error("Error loading commands:", error);
+});
+
+client.once(Events.ClientReady, async (c) => {
+  try {
+    debug.success(`Logged in as ${c.user.tag}!`);
+  } catch (error) {
+    debug.error(error);
+  }
 });
 
 client.on(Events.MessageCreate, async (message) => {
   try {
     const uid = process.env.uid;
-    let botMentioned;
-    message.mentions.users.map((o) => {
-      if (o.id === uid) {
-        botMentioned = true;
-      }
-    });
+    let botMentioned = message.mentions.users.some((o) => o.id === uid);
     debug.info(
-      `${message.member.guild.name} [${message.channel.name}] - ${message.author.username}#${message.author.discriminator} - ${message}`
+      `${message.member?.guild?.name} [${message.channel?.name}] - ${message.author?.username} - ${message}`
     );
     const author = `<@${message.author.id}>`;
     if (message.author.bot) return;
@@ -76,10 +94,14 @@ client.on(Events.MessageCreate, async (message) => {
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 
+    const COMMAND_RESPONSE_ID = "responseid";
+    const COMMAND_RESPONSE_EN = "responseen";
+    const COMMAND_RULES = "rules";
+
     if (
-      command === "responseid" ||
-      command === "responseen" ||
-      command === "rules"
+      command === COMMAND_RESPONSE_ID ||
+      command === COMMAND_RESPONSE_EN ||
+      command === COMMAND_RULES
     ) {
       embeds = richEmbed(command);
       console.log(embeds);
@@ -122,7 +144,7 @@ client.on(Events.MessageCreate, async (message) => {
       debug.info(array);
       let stringResp = "";
       array.forEach((o) => {
-        stringResp + `${o.title} - ${o.salePrice} \n`;
+        stringResp += `${o.title} - ${o.salePrice} \n`;
       });
       debug.info(stringResp);
       return message.channel.send("success");
@@ -133,14 +155,16 @@ client.on(Events.MessageCreate, async (message) => {
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  const command = interaction.client.commands.get(interaction.commandName);
-  debug.info(command);
-  if (!command) {
-    console.error(`No command matching ${interaction.commandName} was found.`);
-    return;
-  }
-
   try {
+    const command = interaction.client.commands.get(interaction.commandName);
+    debug.info(command);
+    if (!command) {
+      console.error(
+        `No command matching ${interaction.commandName} was found.`
+      );
+      return;
+    }
+
     await command.execute(interaction);
   } catch (error) {
     console.error(error);

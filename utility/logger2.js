@@ -1,8 +1,8 @@
 /**
  * Module dependencies.
  */
-const dateFormat = require("dateformat");
-const styles = require("ansi-styles");
+import dateFormat from "dateformat";
+import styles from "ansi-styles";
 
 /**
  * Expose easynodelog
@@ -265,4 +265,4 @@ if (!global.__stack) {
   });
 }
 
-module.exports.debug = new easynodelog();
+export const debug = new easynodelog();
