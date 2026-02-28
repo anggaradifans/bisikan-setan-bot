@@ -19,7 +19,7 @@
     "dateformat": "^3.0.3",
     "discord.js": "^14.7.1",
     "dotenv": "^8.6.0",
-    "nintendo-switch-eshop": "^7.1.2",
+    "nintendo-switch-eshop": "^9.0.0",
     "node-fetch": "^2.6.7",
     "querystring": "^0.2.1",
     "winston": "^3.8.2"
