@@ -6,7 +6,6 @@ import { Client, Events, Collection, GatewayIntentBits } from "discord.js";
 import { bisikan, greeting, nantiAjaBelinya, trigger } from "./response/index.js";
 import { debug, richEmbed } from "./utility/index.js";
 import dotenv from "dotenv";
-import { getGamesAmerica } from "nintendo-switch-eshop";
 
 dotenv.config();
 
@@ -21,8 +20,6 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
-let index;
-let embeds;
 const prefix = "!";
 
 client.commands = new Collection();
@@ -51,128 +48,70 @@ async function loadCommands() {
   }
 }
 
-// Load commands before starting the bot
-loadCommands().then(() => {
-  debug.info("Commands loaded successfully");
-}).catch((error) => {
-  debug.error("Error loading commands:", error);
-});
-
-client.once(Events.ClientReady, async (c) => {
-  try {
-    debug.success(`Logged in as ${c.user.tag}!`);
-  } catch (error) {
-    debug.error(error);
-  }
+client.once(Events.ClientReady, (c) => {
+  debug.success(`Logged in as ${c.user.tag}!`);
 });
 
 client.on(Events.MessageCreate, async (message) => {
   try {
-    const uid = process.env.uid;
-    let botMentioned = message.mentions.users.some((o) => o.id === uid);
-    debug.info(
-      `${message.member?.guild?.name} [${message.channel?.name}] - ${message.author?.username} - ${message}`
-    );
-    const author = `<@${message.author.id}>`;
     if (message.author.bot) return;
+    const content = message.content.toLowerCase();
+    const botMentioned = message.mentions.users.has(client.user?.id);
+    const author = `<@${message.author.id}>`;
+
+    debug.info(
+      `${message.guild?.name ?? "DM"} [${message.channel?.id}] - ${message.author.username} - ${message.content}`
+    );
+
     if (botMentioned) {
-      index = Math.floor(Math.random() * bisikan.length);
-      return message.channel.send(bisikan[index]);
+      return message.channel.send(bisikan[Math.floor(Math.random() * bisikan.length)]);
     }
     if (
-      (message.content.toLowerCase().includes("nanti") ||
-        message.content.toLowerCase().includes("ntar")) &&
-      message.content.toLowerCase().includes("beli")
+      (content.includes("nanti") || content.includes("ntar")) &&
+      content.includes("beli")
     ) {
       return message.channel.send(nantiAjaBelinya);
     }
-    for (let i = 0; i < trigger.length; i++) {
-      if (message.content.toLowerCase().includes(trigger[i])) {
-        index = Math.floor(Math.random() * bisikan.length);
-        return message.channel.send(bisikan[index]);
-      }
+    if (trigger.some((word) => content.includes(word))) {
+      return message.channel.send(bisikan[Math.floor(Math.random() * bisikan.length)]);
     }
+
+    if (!content.startsWith(prefix)) return;
+
     const args = message.content.slice(prefix.length).split(/ +/);
-    const command = args.shift().toLowerCase();
+    const command = args.shift()?.toLowerCase();
 
-    const COMMAND_RESPONSE_ID = "responseid";
-    const COMMAND_RESPONSE_EN = "responseen";
-    const COMMAND_RULES = "rules";
-
-    if (
-      command === COMMAND_RESPONSE_ID ||
-      command === COMMAND_RESPONSE_EN ||
-      command === COMMAND_RULES
-    ) {
-      embeds = richEmbed(command);
-      console.log(embeds);
-      return message.channel.send({ embeds: [embeds] });
+    if (["responseid", "responseen", "rules"].includes(command)) {
+      return message.channel.send({ embeds: [richEmbed(command)] });
     }
     if (command === "greeting") {
       return message.channel.send(greeting(author));
     }
-    if (command === "eshop-discount") {
-      message.channel.send("bentar ya!");
-      let id = 1;
-      let array = [];
-      let limit = 10;
-
-      const response = await getGamesAmerica(["all"]);
-      response
-        .sort((a, b) => b.salePrice - a.salePrice)
-        .every((element) => {
-          if (
-            element.salePrice != null &&
-            element.platform == "Nintendo Switch"
-          ) {
-            let game = {
-              id,
-              title: element.title,
-              releaseDate: element.releaseDateMask,
-              availability: element.availability,
-              price: element.msrp,
-              salePrice: element.salePrice,
-            };
-
-            array.push(game);
-            id++;
-            if (id >= limit) {
-              return false;
-            }
-            return array;
-          }
-        });
-      debug.info(array);
-      let stringResp = "";
-      array.forEach((o) => {
-        stringResp += `${o.title} - ${o.salePrice} \n`;
-      });
-      debug.info(stringResp);
-      return message.channel.send("success");
-    }
   } catch (err) {
-    debug.error(err.response || err);
+    debug.error(err);
   }
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
   try {
     const command = interaction.client.commands.get(interaction.commandName);
-    debug.info(command);
     if (!command) {
-      console.error(
-        `No command matching ${interaction.commandName} was found.`
-      );
+      debug.warn(`No command matching ${interaction.commandName} was found.`);
       return;
     }
 
     await command.execute(interaction);
   } catch (error) {
-    console.error(error);
-    await interaction.reply({
+    debug.error(error);
+    const response = {
       content: "There was an error while executing this command!",
       ephemeral: true,
-    });
+    };
+    if (interaction.replied || interaction.deferred) {
+      await interaction.followUp(response);
+    } else {
+      await interaction.reply(response);
+    }
   }
 });
 
@@ -193,8 +132,41 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(PORT, () => {
-  debug.info(`Health check server running on port ${PORT}`);
-});
+function shutdown(signal) {
+  debug.info(`Received ${signal}; shutting down.`);
+  server.close(() => process.exit(0));
+  client.destroy();
+  setTimeout(() => process.exit(1), 10_000).unref();
+}
 
-client.login(process.env.token);
+function listen(server, port) {
+  return new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(port, () => {
+      server.off("error", reject);
+      resolve();
+    });
+  });
+}
+
+async function start() {
+  if (!process.env.token) {
+    throw new Error("Missing required environment variable: token");
+  }
+
+  await loadCommands();
+  debug.info("Commands loaded successfully");
+
+  await listen(server, PORT);
+  debug.info(`Health check server running on port ${PORT}`);
+
+  await client.login(process.env.token);
+}
+
+process.once("SIGINT", () => shutdown("SIGINT"));
+process.once("SIGTERM", () => shutdown("SIGTERM"));
+
+start().catch((error) => {
+  debug.error(error);
+  process.exitCode = 1;
+});
