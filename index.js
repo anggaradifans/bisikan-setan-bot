@@ -7,7 +7,7 @@ import { bisikan, greeting, nantiAjaBelinya, trigger } from "./response/index.js
 import { debug, richEmbed } from "./utility/index.js";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 // Fix for __dirname in ES6 modules
 const __filename = fileURLToPath(import.meta.url);

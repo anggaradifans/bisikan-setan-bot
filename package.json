@@ -14,21 +14,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ansi-styles": "^3.2.1",
-    "axios": "^1.2.2",
-    "dateformat": "^3.0.3",
-    "discord.js": "^14.7.1",
-    "dotenv": "^8.6.0",
-    "nintendo-switch-eshop": "^7.1.2",
-    "node-fetch": "^2.6.7",
-    "querystring": "^0.2.1",
-    "winston": "^3.8.2"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.20.12",
-    "@babel/node": "^7.20.7",
-    "@babel/preset-env": "^7.20.2",
-    "@babel/register": "^7.18.9",
-    "babel-preset-env": "^0.0.0"
+    "ansi-styles": "^6.2.1",
+    "dateformat": "^5.0.3",
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.2.3"
   }
 }
