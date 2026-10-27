@@ -2,21 +2,21 @@
   "name": "discord-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/worker.js",
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "start": "node index.js",
-    "dev": "node --watch index.js",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
     "deploy-commands": "node deploy-commands.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ansi-styles": "^6.2.1",
-    "dateformat": "^5.0.3",
-    "discord.js": "^14.25.1",
     "dotenv": "^17.2.3"
+  },
+  "devDependencies": {
+    "wrangler": "^4.153.0"
   }
 }

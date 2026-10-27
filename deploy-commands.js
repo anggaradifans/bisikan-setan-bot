@@ -1,40 +1,25 @@
-import { REST, Routes } from 'discord.js';
-import { debug } from './utility/index.js';
-import fs from 'node:fs';
 import dotenv from 'dotenv';
+import commands from './commands/index.js';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
-const commands = [];
-// Grab all the command files from the commands directory you created earlier
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+// Fully refreshes the guild's slash commands with the current set.
+const response = await fetch(
+	`https://discord.com/api/v10/applications/${process.env.uid}/guilds/${process.env.guild}/commands`,
+	{
+		method: 'PUT',
+		headers: {
+			Authorization: `Bot ${process.env.token}`,
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(commands.map((command) => command.data)),
+	},
+);
 
-// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
-for (const file of commandFiles) {
-	const command = await import(`./commands/${file}`);
-	const cmd = command.default || command;
-	commands.push(cmd.data.toJSON());
+if (response.ok) {
+	const data = await response.json();
+	console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+} else {
+	console.error(`Failed to reload commands: ${response.status} ${await response.text()}`);
+	process.exitCode = 1;
 }
-
-// Construct and prepare an instance of the REST module
-const rest = new REST({ version: '10' }).setToken(process.env.token);
-
-// and deploy your commands!
-async function deployCommands() {
-	try {
-		debug.info(`Started refreshing ${commands.length} application (/) commands.`);
-
-		// The put method is used to fully refresh all commands in the guild with the current set
-		const data = await rest.put(
-			Routes.applicationGuildCommands(process.env.uid, process.env.guild),
-			{ body: commands },
-		);
-
-		debug.success(`Successfully reloaded ${data.length} application (/) commands.`);
-	} catch (error) {
-		// And of course, make sure you catch and log any errors!
-		debug.error(error);
-	}
-}
-
-deployCommands();

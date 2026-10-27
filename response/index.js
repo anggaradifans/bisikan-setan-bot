@@ -1,4 +1,4 @@
-import { trim } from "../utility/index.js";
+import { trim } from "../utility/string.js";
 
 export const bisikan = [
   "Mumpung ada, belum tentu ketemu lagi kan",
@@ -78,7 +78,7 @@ export const embed = {
   rules: {
     color: 0xf08080,
     title: "BisikanSetanBot",
-    thumbnail: "https://i.imgur.com/wSTFkRM.png",
+    thumbnail: { url: "https://i.imgur.com/wSTFkRM.png" },
     fields: [
       {
         name: "Commands",
