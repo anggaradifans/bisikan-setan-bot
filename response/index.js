@@ -17,12 +17,16 @@ export const bisikan = [
   "Mending beli lah, daripada nyesel",
   "Lebih baik menyesal beli, daripada menyesal gak beli",
   "Punya duit gak? jangan sok sok beli",
-  "Of course lah",
   "Kalo diskon mah ngapain nanya lagi",
   "The phrase “nanti aja belinya” is such a weak mindset. You are ok with not buying the items that you want, not satisfying your desire. When you felt regret after you miss discount sales, you’ve lost twice. There’s always money in your wallet, and ways to earn them, never settle.",
   "Tinggal masukin cart terus check out",
   "Teman-teman, kalau kalian pengen beli sesuatu itu langsung beli aja ya. Jangan sampai hal ini terjadi ke kalian. Nyesek \n \n -Haswin",
-  "Buat apa sih hemat hemat, kalo mau beli ya beli aja, umur siapa yg tau",
+  "Buat apa sih hemat hemat, kalo mau beli ya beli aja",
+  "Kenapa tidak beli? Kan lu juga suka",
+  "Apa susahnya sih tinggal beli doang",
+  "Kalau nunggu diskon lagi, nanti keburu sold out. Kalau sold out, nangis. Kalau nangis, tambah pengeluaran tisu",
+  "Bukan boros, cuma sedang mendukung perekonomian",
+  "Ngapain investasi, mending belanja lah"
 ];
 
 export const advice = [
