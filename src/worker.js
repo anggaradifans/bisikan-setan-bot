@@ -1,5 +1,6 @@
 import { DurableObject } from "cloudflare:workers";
 import commands from "../commands/index.js";
+import { HISTORY_LIMIT, classifyPurchase, takeDailyCheck } from "./intent.js";
 import { replyTo } from "./reply.js";
 
 const API_URL = "https://discord.com/api/v10";
@@ -244,13 +245,36 @@ export class Gateway extends DurableObject {
 
   async onMessage(message) {
     if (message.author.bot) return;
-    console.log(
-      `${message.guild_id ?? "DM"} [${message.channel_id}] - ${message.author.username} - ${message.content}`
-    );
-    const reply = replyTo(message, this.userId);
+    const reply = await replyTo(message, this.userId, () => this.checkPurchase(message));
     if (reply) {
       await this.discord(`/channels/${message.channel_id}/messages`, reply);
     }
+  }
+
+  // Reads the channel's recent messages and asks Workers AI whether this one is
+  // about buying something. Logs the outcome but never the conversation.
+  async checkPurchase(message) {
+    const log = (outcome) => console.log(`Purchase check ${message.id}: ${outcome}`);
+    let history;
+    try {
+      history = await this.discord(
+        `/channels/${message.channel_id}/messages?before=${message.id}&limit=${HISTORY_LIMIT}`
+      );
+    } catch (error) {
+      log(`no history (${error.message.slice(0, 200)})`);
+      return null;
+    }
+
+    const usage = takeDailyCheck(await this.ctx.storage.get("aiUsage"));
+    if (!usage) {
+      log("daily AI cap reached");
+      return null;
+    }
+    await this.ctx.storage.put("aiUsage", usage);
+
+    const { intent, contextCount, error } = await classifyPurchase({ ai: this.env.AI, message, history });
+    log(`${intent ?? "no answer"}, ${contextCount} context messages${error ? `, ${error}` : ""}`);
+    return intent;
   }
 
   async onInteraction(interaction) {
@@ -277,19 +301,21 @@ export class Gateway extends DurableObject {
     }
   }
 
+  // POSTs `body` when given; otherwise GETs and returns the parsed response.
   async discord(path, body) {
     const response = await fetch(`${API_URL}${path}`, {
-      method: "POST",
+      method: body ? "POST" : "GET",
       headers: {
         Authorization: `Bot ${this.env.token}`,
         "Content-Type": "application/json",
         "User-Agent": USER_AGENT,
       },
-      body: JSON.stringify(body),
+      body: body && JSON.stringify(body),
     });
     if (!response.ok) {
       throw new Error(`Discord API returned ${response.status}: ${await response.text()}`);
     }
+    if (!body) return response.json();
   }
 }
 
