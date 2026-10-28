@@ -4,6 +4,7 @@
   "main": "src/worker.js",
   "compatibility_date": "2026-10-20",
   "observability": { "enabled": true },
+  "ai": { "binding": "AI", "remote": true },
   "durable_objects": {
     "bindings": [{ "name": "GATEWAY", "class_name": "Gateway" }]
   },
