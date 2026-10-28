@@ -4,8 +4,6 @@
   "main": "src/worker.js",
   "compatibility_date": "2026-10-20",
   "observability": { "enabled": true },
-  // Backstop that restarts the gateway's alarm chain if it ever stops.
-  "triggers": { "crons": ["* * * * *"] },
   "durable_objects": {
     "bindings": [{ "name": "GATEWAY", "class_name": "Gateway" }]
   },

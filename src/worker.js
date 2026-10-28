@@ -51,7 +51,7 @@ export class Gateway extends DurableObject {
     });
   }
 
-  // Called by the cron trigger: restarts the alarm chain if it ever stopped.
+  // Starts the alarm chain after the first deploy, or restarts it if it ever stopped.
   async start() {
     if ((await this.ctx.storage.getAlarm()) === null) {
       await this.ctx.storage.setAlarm(Date.now());
@@ -296,12 +296,10 @@ export class Gateway extends DurableObject {
 export default {
   async fetch(request, env) {
     if (new URL(request.url).pathname === "/health") {
-      return Response.json(await env.GATEWAY.getByName("bot").status());
+      const gateway = env.GATEWAY.getByName("bot");
+      await gateway.start();
+      return Response.json(await gateway.status());
     }
     return new Response("Bisikan Setan Bot is running! 🤖");
-  },
-
-  async scheduled(controller, env) {
-    await env.GATEWAY.getByName("bot").start();
   },
 };
