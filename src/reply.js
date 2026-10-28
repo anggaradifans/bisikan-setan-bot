@@ -27,6 +27,7 @@ export async function replyTo(message, botUserId, classify) {
     return null;
   }
 
+  if (content.trim() === "beli") return { content: pick(bisikan) };
   if (!isCandidate(content)) return null;
   const intent = await classify();
   if (intent === "BELI") return { content: pick(bisikan) };

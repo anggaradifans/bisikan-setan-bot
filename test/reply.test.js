@@ -53,6 +53,17 @@ test("only messages with 'beli' are sent to the AI", async () => {
   assert.equal(classify.calls, 0);
 });
 
+test("the exact beli trigger ignores letter case", async () => {
+  const classify = () => {
+    throw new Error("exact triggers should not call the AI");
+  };
+
+  for (const content of ["beli", "Beli", "BELI"]) {
+    const reply = await replyTo(message(content), BOT_ID, classify);
+    assert.ok(bisikan.includes(reply.content));
+  }
+});
+
 test("embed commands are case-insensitive and skip the AI", async () => {
   const classify = classifier("BELI");
   assert.deepEqual(await replyTo(message("!responseID"), BOT_ID, classify), { embeds: [embed.responseid] });
