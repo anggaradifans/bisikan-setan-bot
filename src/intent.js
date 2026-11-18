@@ -13,18 +13,24 @@ const CONTEXT_WINDOW_MS = 30 * 60_000;
 const MAX_CHARS = 300;
 const LABELS = ["BELI", "TUNDA", "TIDAK"];
 
-const SYSTEM_PROMPT = `You read a casual Indonesian Discord chat. Decide whether the author of the LATEST message is, right now, thinking about buying something with real money.
+const SYSTEM_PROMPT = `You read a casual Indonesian Discord chat. Decide whether the LATEST message expresses interest in buying something with real money or encourages someone else to buy.
 
 Answer with exactly one word:
-BELI - they want, are considering, or ask whether/what/where to buy something now. Buying a game, DLC or top-up with real money counts.
+BELI - they want, are considering, or ask whether/what/where to buy something now, OR they tell, encourage, or suggest that someone else buy. Short encouragement such as "lu dong beli" counts even without naming an item. Playful purchase encouragement also counts. Buying a game, DLC or top-up with real money counts.
 TUNDA - they want it but are postponing or holding back ("nanti aja", "nunggu gajian", "tahan dulu").
-TIDAK - anything else: a purchase already made, a decision not to buy ("gak jadi beli"), someone else's purchase, items bought inside a game with game currency, "beli" inside another word (beliau, pembelian), jokes, or when unsure.
+TIDAK - anything else: a purchase already made, a decision not to buy ("gak jadi beli"), merely reporting someone else's purchase, advice against buying, items bought inside a game with game currency, "beli" inside another word (beliau, pembelian), jokes without purchase encouragement, or when unsure.
 
 Earlier messages are context only; judge the latest message.
 
 Examples:
 "Pas beli armor up jadi dragonia lord nya, dari yang runner dragonia lord dapet 2 lagi set wing" -> TIDAK
 "mau beli keyboard baru nih, worth it gak ya?" -> BELI
+"lu dong beli" -> BELI
+"beli aja lu, mumpung diskon" -> BELI
+"temen gw baru beli mobil baru" -> TIDAK
+"jangan beli di toko itu, barangnya palsu" -> TIDAK
+"wkwk beli beli beli" -> TIDAK
+"beli" -> TIDAK
 "pengen sih, tapi ntar aja deh belinya pas gajian" -> TUNDA`;
 
 export const isCandidate = (content) =>
