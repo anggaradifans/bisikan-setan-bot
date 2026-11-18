@@ -12,6 +12,12 @@ export default [
   { expected: "BELI", chat: ["akhirnya kepikiran beli kursi gaming, ada rekomendasi?"] },
   { expected: "BELI", chat: ["top up genshin lagi ada bonus, beli welkin ga ya"] },
 
+  // Encouraging someone else to buy, including playful suggestions.
+  { expected: "BELI", chat: ["lu dong beli"] },
+  { expected: "BELI", chat: ["beli aja lu, mumpung diskon"] },
+  { expected: "BELI", chat: [["budi", "keyboard ini bagus juga"], "gas beli bro"] },
+  { expected: "BELI", chat: [["budi", "anjir lag parah servernya"], ["citra", "iya nih"], "beli server sendiri aja lah wkwk"] },
+
   // Wants it, but postponing.
   { expected: "TUNDA", chat: ["ntar aja deh belinya pas gajian"] },
   { expected: "TUNDA", chat: ["pengen beli sih tapi nunggu harbolnas aja kali ya"] },
@@ -31,7 +37,7 @@ export default [
   { expected: "TIDAK", chat: [["budi", "udah sampe chapter 5?"], "udah, tadi beli pedang baru di blacksmith pake gold"] },
   { expected: "TIDAK", chat: ["di MH Wilds beli bahan di support desk pake poin aja"] },
 
-  // Someone else's purchase, or advice to others.
+  // Reporting someone else's purchase, or advice against buying.
   { expected: "TIDAK", chat: ["temen gw baru beli mobil baru"] },
   { expected: "TIDAK", chat: ["siapa yang beli gorengan tadi?"] },
   { expected: "TIDAK", chat: ["jangan beli di toko itu, barangnya palsu"] },
@@ -42,5 +48,4 @@ export default [
   { expected: "TIDAK", chat: ["kurs beli dolar hari ini berapa ya"] },
   { expected: "TIDAK", chat: ["wkwk beli beli beli"] },
   { expected: "TIDAK", chat: ["beli"] },
-  { expected: "TIDAK", chat: [["budi", "anjir lag parah servernya"], ["citra", "iya nih"], "beli server sendiri aja lah wkwk"] },
 ];
