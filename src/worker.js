@@ -1,6 +1,7 @@
 import { DurableObject } from "cloudflare:workers";
 import { allowlistKey } from "../commands/bisikan-config.js";
 import commands from "../commands/index.js";
+import { handleCommandRegistration } from "./discord-commands.js";
 import { HISTORY_LIMIT, classifyPurchase, takeDailyCheck } from "./intent.js";
 import { replyTo } from "./reply.js";
 
@@ -347,7 +348,9 @@ export class Gateway extends DurableObject {
 
 export default {
   async fetch(request, env) {
-    if (new URL(request.url).pathname === "/health") {
+    const path = new URL(request.url).pathname;
+    if (path === "/admin/discord-commands") return handleCommandRegistration(request, env);
+    if (path === "/health") {
       const gateway = env.GATEWAY.getByName("bot");
       await gateway.start();
       const health = await gateway.status();

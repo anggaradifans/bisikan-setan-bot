@@ -1,0 +1,30 @@
+name: Register Discord Commands
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: register-discord-commands
+  cancel-in-progress: false
+
+jobs:
+  register:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Register the guild's slash commands
+        shell: bash
+        env:
+          WORKER_URL: ${{ vars.DISCORD_COMMAND_WORKER_URL }}
+          REGISTRATION_KEY: ${{ secrets.DISCORD_COMMAND_REGISTRATION_KEY }}
+        run: |
+          if [[ ! "$WORKER_URL" =~ ^https://bisikan-setan-bot\.[a-z0-9-]+\.workers\.dev$ || -z "$REGISTRATION_KEY" ]]; then
+            echo "::error::Configure DISCORD_COMMAND_WORKER_URL and DISCORD_COMMAND_REGISTRATION_KEY."
+            exit 1
+          fi
+          printf 'Authorization: Bearer %s\n' "$REGISTRATION_KEY" |
+            curl --silent --show-error --fail-with-body --max-time 30 \
+              --request POST --header @- "$WORKER_URL/admin/discord-commands"

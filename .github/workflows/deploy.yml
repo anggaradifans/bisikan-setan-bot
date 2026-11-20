@@ -43,10 +43,22 @@ jobs:
 
       - name: Deploy
         if: github.ref == 'refs/heads/main'
-        run: npm run deploy
+        shell: bash
+        run: |
+          if [[ -z "$DISCORD_COMMAND_REGISTRATION_KEY_HASH" ]]; then
+            npm run deploy
+          else
+            npm run deploy -- \
+              --var "DISCORD_APPLICATION_ID:$DISCORD_APPLICATION_ID" \
+              --var "DISCORD_GUILD_ID:$DISCORD_GUILD_ID" \
+              --var "DISCORD_COMMAND_REGISTRATION_KEY_HASH:$DISCORD_COMMAND_REGISTRATION_KEY_HASH"
+          fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DISCORD_APPLICATION_ID: ${{ vars.DISCORD_APPLICATION_ID }}
+          DISCORD_GUILD_ID: ${{ vars.DISCORD_GUILD_ID }}
+          DISCORD_COMMAND_REGISTRATION_KEY_HASH: ${{ vars.DISCORD_COMMAND_REGISTRATION_KEY_HASH }}
 
   check-gateway:
     if: github.ref == 'refs/heads/main'

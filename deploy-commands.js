@@ -1,20 +1,16 @@
 import dotenv from 'dotenv';
-import commands from './commands/index.js';
+import { registerGuildCommands } from './src/discord-commands.js';
 
 dotenv.config({ quiet: true });
 
+const { uid, guild, token } = process.env;
+if (!/^\d{17,20}$/.test(uid ?? "") || !/^\d{17,20}$/.test(guild ?? "") || !token?.trim()) {
+	console.error("Set a valid Discord application ID (uid), server ID (guild), and bot token (token).");
+	process.exit(1);
+}
+
 // Fully refreshes the guild's slash commands with the current set.
-const response = await fetch(
-	`https://discord.com/api/v10/applications/${process.env.uid}/guilds/${process.env.guild}/commands`,
-	{
-		method: 'PUT',
-		headers: {
-			Authorization: `Bot ${process.env.token}`,
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(commands.map((command) => command.data)),
-	},
-);
+const response = await registerGuildCommands(uid, guild, token);
 
 if (response.ok) {
 	const data = await response.json();
