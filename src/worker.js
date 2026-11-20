@@ -60,10 +60,11 @@ export class Gateway extends DurableObject {
   }
 
   async status() {
+    const lastError = (await this.ctx.storage.get("lastError")) ?? null;
     return {
-      status: "healthy",
+      status: this.ready ? "healthy" : "unhealthy",
       botStatus: this.ready ? "connected" : "disconnected",
-      lastError: (await this.ctx.storage.get("lastError")) ?? null,
+      lastError,
       timestamp: new Date().toISOString(),
     };
   }
@@ -235,6 +236,7 @@ export class Gateway extends DurableObject {
 
     if (t === "RESUMED") {
       this.ready = true;
+      await this.ctx.storage.delete("lastError");
       console.log("Gateway session resumed.");
     } else if (t === "MESSAGE_CREATE") {
       await this.onMessage(d);
@@ -255,22 +257,21 @@ export class Gateway extends DurableObject {
   // about buying something. Logs the outcome but never the conversation.
   async checkPurchase(message) {
     const log = (outcome) => console.log(`Purchase check ${message.id}: ${outcome}`);
-    let history;
-    try {
-      history = await this.discord(
-        `/channels/${message.channel_id}/messages?before=${message.id}&limit=${HISTORY_LIMIT}`
-      );
-    } catch (error) {
-      log(`no history (${error.message.slice(0, 200)})`);
-      return null;
-    }
-
     const usage = takeDailyCheck(await this.ctx.storage.get("aiUsage"));
     if (!usage) {
       log("daily AI cap reached");
       return null;
     }
     await this.ctx.storage.put("aiUsage", usage);
+
+    let history = [];
+    try {
+      history = await this.discord(
+        `/channels/${message.channel_id}/messages?before=${message.id}&limit=${HISTORY_LIMIT}`
+      );
+    } catch {
+      log("channel history unavailable");
+    }
 
     const { intent, contextCount, error } = await classifyPurchase({ ai: this.env.AI, message, history });
     log(`${intent ?? "no answer"}, ${contextCount} context messages${error ? `, ${error}` : ""}`);
@@ -324,7 +325,11 @@ export default {
     if (new URL(request.url).pathname === "/health") {
       const gateway = env.GATEWAY.getByName("bot");
       await gateway.start();
-      return Response.json(await gateway.status());
+      const health = await gateway.status();
+      return Response.json(health, {
+        status: health.botStatus === "connected" ? 200 : 503,
+        headers: { "Cache-Control": "no-store" },
+      });
     }
     return new Response("Bisikan Setan Bot is running! 🤖");
   },

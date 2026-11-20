@@ -1,0 +1,43 @@
+name: Check Discord gateway health
+
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_call:
+    secrets:
+      CLOUDFLARE_API_TOKEN:
+        required: true
+      CLOUDFLARE_ACCOUNT_ID:
+        required: true
+
+permissions: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wait for the Discord gateway
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          subdomain=$(curl --silent --show-error --fail --max-time 15 \
+            --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/subdomain" \
+            | jq -er '.result.subdomain | strings | select(test("^[a-z0-9-]+$"))')
+          url="https://bisikan-setan-bot.$subdomain.workers.dev/health"
+
+          # The first probe can start the alarm, so give Discord time to connect.
+          for attempt in {1..16}; do
+            if response=$(curl --silent --show-error --fail --max-time 5 "$url") &&
+               jq -e '.botStatus == "connected"' <<< "$response" > /dev/null; then
+              echo "Discord gateway is connected."
+              exit 0
+            fi
+            if [ "$attempt" -lt 16 ]; then sleep 10; fi
+          done
+
+          echo "::error::Discord gateway did not report readiness."
+          exit 1
