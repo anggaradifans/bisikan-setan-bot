@@ -33,7 +33,8 @@ export async function handleCommandRegistration(request, env) {
   const key = /^Bearer ([A-Za-z0-9_-]{43})$/i.exec(request.headers.get("Authorization") ?? "")?.[1];
   if (!key) return json({ error: "Unauthorized." }, 401);
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(key));
-  if (!crypto.subtle.timingSafeEqual(digest, Uint8Array.fromHex(keyHash))) {
+  const expected = Uint8Array.from(keyHash.match(/../g), (byte) => Number.parseInt(byte, 16));
+  if (!crypto.subtle.timingSafeEqual(digest, expected)) {
     return json({ error: "Unauthorized." }, 401);
   }
 
