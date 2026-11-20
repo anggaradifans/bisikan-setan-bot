@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { bisikan, embed, nantiAjaBelinya } from "../response/index.js";
+import cases from "../scripts/intent-cases.js";
 import { replyTo } from "../src/reply.js";
 
 const BOT_ID = "999";
@@ -46,11 +47,24 @@ test("no intent or no answer gets no reply", async () => {
   }
 });
 
-test("only messages with 'beli' are sent to the AI", async () => {
+test("unrelated messages are skipped before calling the AI", async () => {
   const classify = classifier("BELI");
   assert.equal(await replyTo(message("halo semua"), BOT_ID, classify), null);
   assert.equal(await replyTo(message("hey <@555>", [{ id: "555" }]), BOT_ID, classify), null);
   assert.equal(classify.calls, 0);
+});
+
+test("labelled chats follow the expected route through replyTo", async () => {
+  for (const { expected, skipAI = false, chat } of cases) {
+    const latest = chat.at(-1);
+    const text = Array.isArray(latest) ? latest[1] : latest;
+    const classify = classifier(expected);
+    const reply = await replyTo(message(text), BOT_ID, classify);
+    assert.equal(classify.calls, skipAI ? 0 : 1, text);
+    if (expected === "BELI") assert.ok(bisikan.includes(reply?.content), text);
+    if (expected === "TUNDA") assert.equal(reply?.content, nantiAjaBelinya, text);
+    if (expected === "TIDAK") assert.equal(reply, null, text);
+  }
 });
 
 test("the exact beli trigger ignores letter case", async () => {

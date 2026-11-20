@@ -38,7 +38,7 @@ export const advice = [
   "Buying stuff you want isn’t necessarily a bad thing",
 ];
 
-export const trigger = ["beli", "belilah", "beli lah"];
+export const randomBisikan = () => bisikan[Math.floor(Math.random() * bisikan.length)];
 
 export const nantiAjaBelinya =
   "The phrase “nanti aja belinya” is such a weak mindset. You are ok with not buying the items that you want, not satisfying your desire. When you felt regret after you miss discount sales, you’ve lost twice. There’s always money in your wallet, and ways to earn them, never settle.";

@@ -1,4 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
+import { allowlistKey } from "../commands/bisikan-config.js";
 import commands from "../commands/index.js";
 import { HISTORY_LIMIT, classifyPurchase, takeDailyCheck } from "./intent.js";
 import { replyTo } from "./reply.js";
@@ -11,6 +12,7 @@ const USER_AGENT = "DiscordBot (https://github.com/anggaradifans/bisikan-setan-b
 const INTENTS = (1 << 0) | (1 << 9) | (1 << 15);
 
 const WATCHDOG_MS = 60_000;
+const AUTOMATIC_COOLDOWN_MS = 30_000;
 // Discord allows 1000 identifies a day; one per 2 minutes stays well under it.
 const IDENTIFY_GAP_MS = 2 * 60_000;
 const FATAL_RETRY_MS = 60 * 60_000;
@@ -43,6 +45,7 @@ export class Gateway extends DurableObject {
   heartbeatInterval = 41_250;
   session = null; // { id, resumeUrl, seq }, mirrored in storage
   userId = null;
+  automaticReplies = new Map();
 
   constructor(ctx, env) {
     super(ctx, env);
@@ -70,6 +73,10 @@ export class Gateway extends DurableObject {
   }
 
   async alarm() {
+    const now = Date.now();
+    for (const [channel, until] of this.automaticReplies) {
+      if (until <= now) this.automaticReplies.delete(channel);
+    }
     try {
       if (!this.ws) return await this.connect();
       if (!this.acked) {
@@ -247,9 +254,27 @@ export class Gateway extends DurableObject {
 
   async onMessage(message) {
     if (message.author.bot) return;
-    const reply = await replyTo(message, this.userId, () => this.checkPurchase(message));
-    if (reply) {
-      await this.discord(`/channels/${message.channel_id}/messages`, reply);
+    const { channel_id: channelId, guild_id: guildId } = message;
+    let reserved = false;
+    const allowAutomatic = async () => {
+      const channels = guildId ? await this.ctx.storage.get(allowlistKey(guildId)) : undefined;
+      if (channels && !channels.includes(channelId)) return false;
+      if ((this.automaticReplies.get(channelId) ?? 0) > Date.now()) return false;
+
+      // Reserve the channel while classification and delivery are in flight.
+      this.automaticReplies.set(channelId, Infinity);
+      reserved = true;
+      return true;
+    };
+    try {
+      const reply = await replyTo(message, this.userId, () => this.checkPurchase(message), allowAutomatic);
+      if (!reply) return;
+      await this.discord(`/channels/${channelId}/messages`, reply);
+      if (reserved) this.automaticReplies.set(channelId, Date.now() + AUTOMATIC_COOLDOWN_MS);
+    } finally {
+      if (reserved && this.automaticReplies.get(channelId) === Infinity) {
+        this.automaticReplies.delete(channelId);
+      }
     }
   }
 
@@ -292,7 +317,7 @@ export class Gateway extends DurableObject {
       });
 
     try {
-      await command.execute({ ...interaction, reply });
+      await command.execute({ ...interaction, reply }, { storage: this.ctx.storage });
     } catch (error) {
       console.error(error);
       await reply({

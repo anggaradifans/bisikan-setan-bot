@@ -11,10 +11,13 @@ export default [
   { expected: "BELI", chat: [["andi", "headphone gw rusak anjir"], "kayaknya harus beli baru deh"] },
   { expected: "BELI", chat: ["akhirnya kepikiran beli kursi gaming, ada rekomendasi?"] },
   { expected: "BELI", chat: ["top up genshin lagi ada bonus, beli welkin ga ya"] },
+  { expected: "BELI", chat: ["mau checkout keyboard ini"] },
+  { expected: "BELI", chat: ["beliin gue DLC-nya dong"] },
 
   // Encouraging someone else to buy, including playful suggestions.
   { expected: "BELI", chat: ["lu dong beli"] },
   { expected: "BELI", chat: ["beli aja lu, mumpung diskon"] },
+  { expected: "BELI", chat: ["dibeli aja monitor itu, mumpung diskon"] },
   { expected: "BELI", chat: [["budi", "keyboard ini bagus juga"], "gas beli bro"] },
   { expected: "BELI", chat: [["budi", "anjir lag parah servernya"], ["citra", "iya nih"], "beli server sendiri aja lah wkwk"] },
 
@@ -30,7 +33,8 @@ export default [
   { expected: "TIDAK", chat: ["kemarin gw beli kopi di deket kantor, enak banget"] },
   { expected: "TIDAK", chat: ["akhirnya kemaren beli juga tuh keyboard, mantap"] },
   { expected: "TIDAK", chat: [["andi", "gw baru dapet ssd kemarin"], ["budi", "berapa?"], "1.2jt, beli di tokped"] },
-  { expected: "TIDAK", chat: ["pembelian tiket konser kemarin ribet banget"] },
+  { expected: "TIDAK", skipAI: true, chat: ["pembelian tiket konser kemarin ribet banget"] },
+  { expected: "TIDAK", chat: ["tadi udah check out sepatu di tokped"] },
 
   // Inside a game, with game currency.
   { expected: "TIDAK", chat: ["di game ini lu bisa beli potion di toko npc pake gold"] },
@@ -44,8 +48,9 @@ export default [
 
   // Not buying, other meanings, unclear.
   { expected: "TIDAK", chat: ["gw gak jadi beli, udah gak pengen"] },
-  { expected: "TIDAK", chat: ["beliau lagi rapat, nanti aja ya"] },
+  { expected: "TIDAK", skipAI: true, chat: ["beliau lagi rapat, nanti aja ya"] },
+  { expected: "TIDAK", chat: ["besok jam berapa check-out hotelnya?"] },
   { expected: "TIDAK", chat: ["kurs beli dolar hari ini berapa ya"] },
   { expected: "TIDAK", chat: ["wkwk beli beli beli"] },
-  { expected: "TIDAK", chat: ["beli"] },
+  { expected: "BELI", skipAI: true, chat: [" BELI "] },
 ];

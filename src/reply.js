@@ -1,17 +1,14 @@
-import { bisikan, embed, greeting, nantiAjaBelinya } from "../response/index.js";
+import { embed, greeting, nantiAjaBelinya, randomBisikan } from "../response/index.js";
 import { isCandidate } from "./intent.js";
 
 const prefix = "!";
 
-const pick = (list) => list[Math.floor(Math.random() * list.length)];
-
 // Builds the reply body for a gateway MESSAGE_CREATE payload, or null to stay quiet.
-// `classify` asks the AI about a purchase and resolves to "BELI", "TUNDA" or anything else.
-export async function replyTo(message, botUserId, classify) {
+export async function replyTo(message, botUserId, classify, allowAutomatic = () => true) {
   const content = message.content.toLowerCase();
 
   if (message.mentions.some((user) => user.id === botUserId)) {
-    return { content: pick(bisikan) };
+    return { content: randomBisikan() };
   }
 
   if (content.startsWith(prefix)) {
@@ -27,10 +24,10 @@ export async function replyTo(message, botUserId, classify) {
     return null;
   }
 
-  if (content.trim() === "beli") return { content: pick(bisikan) };
-  if (!isCandidate(content)) return null;
+  if (!isCandidate(content) || !(await allowAutomatic())) return null;
+  if (content.trim() === "beli") return { content: randomBisikan() };
   const intent = await classify();
-  if (intent === "BELI") return { content: pick(bisikan) };
+  if (intent === "BELI") return { content: randomBisikan() };
   if (intent === "TUNDA") return { content: nantiAjaBelinya };
   return null;
 }

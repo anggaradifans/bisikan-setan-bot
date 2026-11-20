@@ -27,10 +27,17 @@ const fakeAi = (answer) => ({
   },
 });
 
-test("only messages containing 'beli' are candidates", () => {
-  assert.ok(isCandidate("Mau BELI keyboard"));
-  assert.ok(isCandidate("ntar aja belinya"));
-  assert.ok(!isCandidate("halo semua"));
+test("purchase words match as tokens and support common Indonesian forms", () => {
+  const matching = [
+    "Mau BELI keyboard", "ntar aja belinya", "belilah!", "beliin dong",
+    "mau membeli", "dibeli aja", "mau checkout", "check out yuk", "mau check-out",
+  ];
+  for (const content of matching) {
+    assert.equal(isCandidate(content), true, content);
+  }
+  for (const content of ["halo semua", "beliau", "pembelian tiket", "beli123", "precheckout"]) {
+    assert.equal(isCandidate(content), false, content);
+  }
 });
 
 test("the conversation keeps the latest 8 human messages from the last 30 minutes, oldest first", () => {

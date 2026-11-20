@@ -1,4 +1,3 @@
-import { trigger } from "../response/index.js";
 import { trim } from "../utility/string.js";
 
 export const MODEL = "@cf/google/gemma-4-26b-a4b-it";
@@ -12,13 +11,14 @@ const CONTEXT_MESSAGES = 8;
 const CONTEXT_WINDOW_MS = 30 * 60_000;
 const MAX_CHARS = 300;
 const LABELS = ["BELI", "TUNDA", "TIDAK"];
+const PURCHASE_WORDS = /(?<![\p{L}\p{M}\p{N}_])(?:beli(?:nya|lah|in|kan)?|(?:mem|di)beli(?:nya|kan(?:nya)?)?|check[ -]?out)(?![\p{L}\p{M}\p{N}_])/iu;
 
 const SYSTEM_PROMPT = `You read a casual Indonesian Discord chat. Decide whether the LATEST message expresses interest in buying something with real money or encourages someone else to buy.
 
 Answer with exactly one word:
 BELI - they want, are considering, or ask whether/what/where to buy something now, OR they tell, encourage, or suggest that someone else buy. Short encouragement such as "lu dong beli" counts even without naming an item. Playful purchase encouragement also counts. Buying a game, DLC or top-up with real money counts.
 TUNDA - they want it but are postponing or holding back ("nanti aja", "nunggu gajian", "tahan dulu").
-TIDAK - anything else: a purchase already made, a decision not to buy ("gak jadi beli"), merely reporting someone else's purchase, advice against buying, items bought inside a game with game currency, "beli" inside another word (beliau, pembelian), jokes without purchase encouragement, or when unsure.
+TIDAK - anything else: a purchase already made, a decision not to buy ("gak jadi beli"), merely reporting someone else's purchase, advice against buying, items bought inside a game with game currency, checking out of a hotel, jokes without purchase encouragement, or when unsure.
 
 Earlier messages are context only; judge the latest message.
 
@@ -33,8 +33,7 @@ Examples:
 "beli" -> TIDAK
 "pengen sih, tapi ntar aja deh belinya pas gajian" -> TUNDA`;
 
-export const isCandidate = (content) =>
-  trigger.some((word) => content.toLowerCase().includes(word));
+export const isCandidate = (content) => PURCHASE_WORDS.test(content);
 
 const line = (message) => `${message.author.username}: ${trim(message.content, MAX_CHARS)}`;
 
